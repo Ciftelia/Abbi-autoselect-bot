@@ -3,9 +3,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 import os
+from dotenv import load_dotenv
 
 def main():
     POSSIBLE_VALUES = ["Python", "Lesson Set 1", "Lesson Set 2", "Lesson Set 3"]
+    load_dotenv()
     EMAIL = os.getenv("EMAIL")
     PASS = os.getenv("PASS")
     text = ""
@@ -25,9 +27,9 @@ def main():
     wait = WebDriverWait(driver, timeout=10)
 
     # login
-    email_box = driver.find_element(by=By.NAME, value="email")
-    password_box = driver.find_element(by=By.NAME, value="password")
-    submit_button = driver.find_element(by=By.CLASS_NAME, value="login-btn")
+    email_box = wait.until(lambda _: driver.find_element(by=By.NAME, value="email"))
+    password_box = wait.until(lambda _: driver.find_element(by=By.NAME, value="password"))
+    submit_button = wait.until(lambda _: driver.find_element(by=By.CLASS_NAME, value="login-btn"))
 
     email_box.send_keys(EMAIL)
     password_box.send_keys(PASS)
