@@ -4,6 +4,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 import os
 from dotenv import load_dotenv
+import abbi_utils
 
 def main():
     POSSIBLE_VALUES = ["1015", "Mental Math"]
@@ -22,23 +23,10 @@ def main():
         selections = ["Lesson Set 1", "Lesson Set 2"]
 
     # set up
-    options = webdriver.ChromeOptions()
-    options.add_experimental_option("detach", True) 
-    options.add_experimental_option("prefs", {
-        "profile.password_manager_leak_detection": False
-    })
-    driver = webdriver.Chrome(options=options)
-    driver.get("https://mylessons.abiis-world.com/creators/login/?next=/")
-    wait = WebDriverWait(driver, timeout=10)
+    driver, wait = abbi_utils.driver_setup()
 
     # login
-    email_box = wait.until(lambda _: driver.find_element(by=By.NAME, value="email"))
-    password_box = wait.until(lambda _: driver.find_element(by=By.NAME, value="password"))
-    submit_button = wait.until(lambda _: driver.find_element(by=By.CLASS_NAME, value="login-btn"))
-
-    email_box.send_keys(EMAIL)
-    password_box.send_keys(PASS)
-    submit_button.click()
+    abbi_utils.abii_login(driver, wait, EMAIL, PASS)
 
     # Click Send Lessons to ABii
     send_lessons_btn = wait.until(
