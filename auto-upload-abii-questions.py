@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 
 def main():
-    POSSIBLE_VALUES = ["Python", "Lesson Set 1", "Lesson Set 2", "Lesson Set 3"]
+    POSSIBLE_VALUES = ["1015", "Mental Math"]
     load_dotenv()
     EMAIL = os.getenv("EMAIL")
     PASS = os.getenv("PASS")
@@ -15,6 +15,11 @@ def main():
     while (text not in POSSIBLE_VALUES):
         print("Type in the lesson type you'd like to pick: ", POSSIBLE_VALUES)
         text = input()
+        
+    if text == POSSIBLE_VALUES[0]:
+        selections = ["Python", "puzzle"]
+    else:
+        selections = ["Lesson Set 1", "Lesson Set 2"]
 
     # set up
     options = webdriver.ChromeOptions()
@@ -52,10 +57,10 @@ def main():
         first_td = wait.until(lambda d: row.find_element(By.TAG_NAME, "td"))
         # check if clicked
         if (row.get_attribute("class") == "MuiTableRow-root MuiTableRow-hover Mui-selected"):
-            if (text not in first_th.text):
+            if not any(sel in first_th.text for sel in selections):
                 first_td.click()
         else:
-            if (text in first_th.text):
+            if any(sel in first_th.text for sel in selections):
                 first_td.click()
                 
     print("\nLesson selection complete, please review the selection and send the results to the robot with the 'Save Changes' button at the bottom of the screen.")
