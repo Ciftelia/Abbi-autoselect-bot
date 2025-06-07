@@ -7,7 +7,7 @@ from selenium.webdriver.common.keys import Keys
 import logging
 import os
 from dotenv import load_dotenv
-import abii_utils
+from abii_utils import AbiiUtils
 
 # load environment variables
 load_dotenv()
@@ -23,13 +23,17 @@ logging.basicConfig(
 # Process spreadsheet
 logging.info("Processing Excel Spreadsheet...")
 df = pd.read_excel("all questions.xlsx")
-logging.info("Processed Excel Spreadsheet. :D")
+logging.info("Processed Excel Spreadsheet.")
 
 # Set up
-driver, wait = abii_utils.driver_setup()
+abii = AbiiUtils(email=EMAIL, password=PASS)
+
+# get driver and wait
+driver = abii.get_driver()
+wait = abii.get_wait()
 
 # Login
-abii_utils.abii_login(driver, wait, EMAIL, PASS)
+abii.login()
 
 # ... your automation code here ...
 # Loop through every row in the DataFrame
@@ -37,43 +41,11 @@ for index, row in df.iterrows():
     # You can access each cell with row['column_name']
     # Example: print(row['question'])
     
-    ##
-    ## PreAssessment
-    ##
-    
-    ############################################### Side Bar ############################################################################################## 
-    # Click create lesson
-    create_lesson_btn = wait.until(lambda d: d.find_element(By.XPATH, '/html/body/div/div/div/section/section/div/div[6]/div[1]/div/div/div[2]/button[2]'))
-    create_lesson_btn.click()
+    abii.open_lesson_creation_page()
+    # abii.load_preassessment_elements()
 
-    # Close the popup
-    close_popup_btn = wait.until(lambda d: d.find_element(By.XPATH, '/html/body/div/div/div/div[3]/div[4]/form/div/div[13]/div[1]/div/p'))
-    close_popup_btn.click()
-
-    # Set lesson type to math
-    lesson_type_dropdown = wait.until(lambda d: d.find_element(By.XPATH, '//*[@id="option_whitebox_invisible_scroll"]/span[1]/div/span/div[1]/div'))
-    lesson_type_dropdown.click()
-    math_option = wait.until(lambda d: d.find_element(By.XPATH, '//*[@id="menu-lesson_type"]/div[3]/ul/li[2]'))
-    math_option.click()
     
-    # BUG: Select doesn't work for everything below must use method used by lesson_type.
-    # Choose Grade
-    grade_input = Select(wait.until(lambda d: d.find_element(By.XPATH, '/html/body/div/div/div/div[3]/div[4]/form/div/div[13]/span[1]/div/span/div[1]/div/div/input')))
-    # If Set 1: Grade K
-    if (row[set] == 1):
-        grade_input.select_by_index(1)
-    # If Set 2: Grade 1
-    else:
-        grade_input.select_by_index(2)
-        
-    # Select National Standard Unit Name
-    rand = Select(wait.until(lambda d: d.find_element(By.XPATH, '/html/body/div/div/div/div[3]/div[4]/form/div/div[13]/span[1]/div/span/div[4]/div/div/input')))
-    rand.select_by_index(1)
-    
-    # Select National Standard Unit Number
-    rand = Select(wait.until(lambda d: d.find_element(By.XPATH, '/html/body/div/div/div/div[3]/div[4]/form/div/div[13]/span[1]/div/span/div[5]/div/div/input')))
-    rand.select_by_index(1)
-    
+    # temp pause to output
     input("Waiting...")
     
 
