@@ -1,11 +1,7 @@
 import pandas as pd
-from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait, Select
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
-import logging
 import os
+import logging
 from dotenv import load_dotenv
 from abii_utils import AbiiUtils
 
@@ -35,19 +31,28 @@ wait = abii.get_wait()
 # Login
 abii.login()
 
-# ... your automation code here ...
-# Loop through every row in the DataFrame
 for index, row in df.iterrows():
-    # You can access each cell with row['column_name']
-    # Example: print(row['question'])
-    
+    logging.info("Opening lesson creation page...")
     abii.open_lesson_creation_page()
-    # abii.load_preassessment_elements()
-
     
+    # Start with static elements
+    logging.info("Loading static elements...")
+    elements = abii.load_static_elements()
+    logging.info("Loaded static elements.")
+    
+    # Set up static elements
+    # Wait until the lesson type dropdown is clickable before selecting 'Math'
+    abii.select_from_dropdown_by_visible_text(elements.lesson_options.lesson_type_dropdown, 'Math')
+    abii.select_from_dropdown_by_visible_text(
+        elements.lesson_options.grade_dropdown,"Grade K" if row['Set'] == 1 or row['Set'] == '1' else "Grade 1"
+    )
+    abii.select_from_dropdown_by_index(elements.lesson_options.unit_dropdown, 2)
+    abii.select_from_dropdown_by_index(elements.lesson_options.standard_dropdown, 2)
+    elements.lesson_name_input.send_keys(f"V1: Lesson Set {row['Set']} Q{row['Question Number']}")
+    elements.mascot_buttons[1].click() 
+
     # temp pause to output
     input("Waiting...")
-    
 
 
 
