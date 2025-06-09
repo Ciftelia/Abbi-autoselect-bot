@@ -35,7 +35,7 @@ wait = abii.get_wait()
 abii.login()
 
 for index, row in df.iterrows():
-    logging.info(f"Processing question {index}...")
+    logging.info(f"Processing question %d...", index)
     logging.info("Opening lesson creation page...")
     abii.open_lesson_creation_page()
     logging.info("Opened lesson creation page.")
@@ -145,7 +145,7 @@ for index, row in df.iterrows():
     abii.generate_onload_audio(elements.text_to_speech_buttons[0], row['Detailed Hint (Audio)'])
     logging.info("Entered recap elements.")
 
-    logging.info("Processed question %s.", index)
+    logging.info("Processed question %d.", index)
 
     # Save and move on
     elements_static.mark_as_ready_button.click()
