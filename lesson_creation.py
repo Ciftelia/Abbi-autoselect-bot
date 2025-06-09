@@ -54,7 +54,7 @@ for index, row in df.iterrows():
     )
     abii.select_from_dropdown_by_index(elements_static.lesson_options.unit_dropdown, 2)
     abii.select_from_dropdown_by_index(elements_static.lesson_options.standard_dropdown, 2)
-    elements_static.lesson_name_input.send_keys(f"V1: Lesson Set {row['Set']} Q{row['Question Number']}")
+    elements_static.lesson_name_input.send_keys(f"Abii: Lesson Set {row['Set']} Q{row['Question Number']:02d}")
     # TODO: Make this more clear.
     elements_static.mascot_buttons[1].click()
     logging.info("Entered static elements.")
@@ -69,22 +69,28 @@ for index, row in df.iterrows():
     # Add question
     elements.question_input.send_keys(row['Question'])
     # Choose Image
-    abii.add_image(elements.select_existing_image_button, 1)
+    abii.add_image(1)
+    # Gen answers
+
+    if row['Is Divisable?'] == 'Yes':
+        answers = ['Yes', "No", 'Hint 1']
+    else:
+        answers = ['No', "Yes", 'Hint 1']
+
     # Add choices
-    abii.add_multiple_choice_answers(elements, row['Is Divisable?'])
+    abii.add_multiple_choice_answers(answers)
     # Add audio
-    abii.generate_onload_audio(elements.text_to_speech_buttons[0], row['Question'])
-    abii.generate_choice_audio(elements.text_to_speech_buttons[1])
+    abii.generate_onload_audio(row['Question'])
     logging.info("Entered pre-assessment elements.")
 
     ##########################################################################################
     ## Introduction and Subject Elements #####################################################
     ##########################################################################################
     logging.info("Entering introduction elements...")
-    abii.fill_intro_page(abii.load_introduction_elements(), f'Lesson Set {row['Set']}, Question {row['Question Number']}', 1)
+    abii.fill_intro_page( f'Lesson Set {row['Set']}, Question {row['Question Number']}', 1)
     logging.info("Entered introduction elements.")
     logging.info("Entering subject elements...")
-    abii.fill_subject_page(abii.load_subject_elements(), f"Let's get started!", 1)
+    abii.fill_subject_page(f"Let's get started!", 1)
     logging.info("Entered subject elements.")
 
     ##########################################################################################
@@ -97,15 +103,22 @@ for index, row in df.iterrows():
     # Set step name
     elements.step_name_input.send_keys('Step 1')
     # add image
-    abii.add_image(elements.select_existing_image_button, 1)
+    abii.add_image(1)
     # add step question
     elements.step_question_input.send_keys(row['General Hint (Text + Audio)'])
+    # Gen answers
+
+    if row['Is Divisable?'] == 'Yes':
+        answers = ['Yes', "No", 'Hint 2']
+    else:
+        answers = ['No', "Yes", 'Hint 2']
+
     # add answers
-    abii.add_multiple_choice_answers(elements, row['Is Divisable?'])
+    abii.add_multiple_choice_answers(answers)
     # add audio
-    abii.generate_onload_audio(elements.text_to_speech_buttons[0], row['General Hint (Text + Audio)'])
-    abii.generate_wrong_audio(elements.text_to_speech_buttons[1], ' ') 
-    abii.generate_choice_audio(elements.text_to_speech_buttons[2])
+    abii.generate_onload_audio(row['General Hint (Text + Audio)'])
+    abii.generate_wrong_audio(' ')
+    abii.generate_choice_audio()
     logging.info("Entered step 1 elements.")
 
     ##########################################################################################
@@ -118,15 +131,19 @@ for index, row in df.iterrows():
     # Set step name
     elements.step_name_input.send_keys('Step 2')
     # add image
-    abii.add_image(elements.select_existing_image_button, 1)
+    abii.add_image(1)
     # add step question
     elements.step_question_input.send_keys(row['Specific (Text)'])
     # add answers
-    abii.add_multiple_choice_answers(elements, row['Is Divisable?'])
+    if row['Is Divisable?'] == 'Yes':
+        answers = ['Yes', "No", 'Hint 3']
+    else:
+        answers = ['No', "Yes", 'Hint 3']
+    abii.add_multiple_choice_answers(answers)
     # add audio
-    abii.generate_onload_audio(elements.text_to_speech_buttons[0], row['Specific (Audio)'])
-    abii.generate_wrong_audio(elements.text_to_speech_buttons[1], ' ')  
-    abii.generate_choice_audio(elements.text_to_speech_buttons[2])
+    abii.generate_onload_audio(row['Specific (Audio)'])
+    abii.generate_wrong_audio(' ')
+    abii.generate_choice_audio()
     logging.info("Entered step 2 elements.")
 
     ##########################################################################################
@@ -138,11 +155,11 @@ for index, row in df.iterrows():
     logging.info("Loaded recap elements.")
     time.sleep(1)
     # add image
-    abii.add_image(elements.select_existing_image_button, 1)
+    abii.add_image(1)
     # add step question
     elements.recap_question_input.send_keys(parse_html_to_text(row['Detailed Hint (HTML Text)']))
     # add audio
-    abii.generate_onload_audio(elements.text_to_speech_buttons[0], row['Detailed Hint (Audio)'])
+    abii.generate_onload_audio(row['Detailed Hint (Audio)'])
     logging.info("Entered recap elements.")
 
     logging.info("Processed question %d.", index)

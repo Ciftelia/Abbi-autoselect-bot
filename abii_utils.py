@@ -5,7 +5,6 @@ from selenium.webdriver.support.wait import WebDriverWait
 from bs4 import BeautifulSoup
 import time
 import re
-import logging
 
 # Import LessonOptions if it's defined in abbi_lesson_creation_elements
 from abbi_lesson_creation_elements import LessonOptions, StaticElements, PreAssessmentElements, AnswerElements, \
@@ -57,6 +56,7 @@ class AbiiUtils:
         self.wait = WebDriverWait(self.driver, timeout=30)
         self.email = email
         self.password = password
+        self.elements = None
         
     def get_driver(self):
         """
@@ -69,6 +69,9 @@ class AbiiUtils:
         Returns the WebDriverWait instance.
         """
         return self.wait
+
+    def get_elements(self):
+        return self.elements
 
     def select_from_dropdown_by_index(self, element, index):
         """
@@ -125,24 +128,18 @@ class AbiiUtils:
         close_popup_btn = self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, '#info-modal-inner > p'))
         close_popup_btn.click()
 
-    def add_multiple_choice_answers(self, elements, divisibility):
+    def add_multiple_choice_answers(self, array_of_answers):
         """
         Fill in multiple choice answers based on divisibility.
 
         Args:
             elements: Elements object containing answer buttons.
-            divisibility (str): "Yes" or "No" to determine answer order.
+            array_of_answers (array):
         """
-        if (divisibility== "Yes"):
-            elements.answers.answer_buttons[0].send_keys("Yes")
-            elements.answers.answer_buttons[1].send_keys("No")
-            elements.answers.answer_buttons[2].send_keys("I don't know")
-        else:
-            elements.answers.answer_buttons[0].send_keys("No")
-            elements.answers.answer_buttons[1].send_keys("Yes")
-            elements.answers.answer_buttons[2].send_keys("I don't know")
+        for index, answer in enumerate(array_of_answers):
+            self.elements.answers.answer_buttons[index].send_keys(answer)
 
-    def add_image(self, element, index):
+    def add_image(self, index):
         """
         Select an image by index from the image selection container.
 
@@ -150,11 +147,11 @@ class AbiiUtils:
             element (WebElement): The button to open the image selector.
             index (int): The index of the image to select (1-based).
         """
-        element.click()
+        self.elements.select_existing_image_button.click()
         self.wait.until(
             lambda d: d.find_element(By.CSS_SELECTOR, f'#image_selection_container > div:nth-child({index}) > button')).click()
 
-    def fill_intro_page(self, elements, onload_audio, img_index):
+    def fill_intro_page(self, onload_audio, img_index):
         """
         Fill the introduction page with an image and onload audio.
 
@@ -163,17 +160,20 @@ class AbiiUtils:
             onload_audio (str): Text for the onload audio.
             img_index (int): Index of the image to select.
         """
-        self.add_image(elements.select_existing_image_button, img_index)
-        self.generate_onload_audio(elements.text_to_speech_buttons[0], onload_audio)
+        self.load_introduction_elements()
+        self.add_image(img_index)
+        self.generate_onload_audio(onload_audio)
         
-    def fill_subject_page(self, elements, onload_audio, img_index):
+    def fill_subject_page(self, onload_audio, img_index):
         """
         Alias for fill_intro_page().
         
         """
-        self.fill_intro_page(elements, onload_audio, img_index)
+        self.load_subject_elements()
+        self.add_image(img_index)
+        self.generate_onload_audio(onload_audio)
 
-    def generate_onload_audio(self, element, text):
+    def generate_onload_audio(self, text):
         """
         Generate onload audio for a given element and text.
 
@@ -181,7 +181,7 @@ class AbiiUtils:
             element (WebElement): The button to trigger audio generation.
             text (str): The text to convert to audio.
         """
-        element.click()
+        self.elements.text_to_speech_buttons[0].click()
         input_box = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#text-to-audio-input')))
         input_box.clear()
         input_box.send_keys(text)
@@ -189,20 +189,27 @@ class AbiiUtils:
         self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.success-box.convert-msg-box')))
         self.wait.until(lambda d: d.find_element(By.CLASS_NAME, 'info_popup_close_btn')).click()
         
-    def generate_wrong_audio(self, element, text):
+    def generate_wrong_audio(self, text):
         """ 
         Alias for generate_onload_audio().
         """
-        self.generate_onload_audio(element, text)
+        self.elements.text_to_speech_buttons[1].click()
+        input_box = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#text-to-audio-input')))
+        input_box.clear()
+        input_box.send_keys(text)
+        self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR,
+                                                 '#option_whitebox_invisible_scroll > span:nth-child(3) > div > span > div > div.text_to_audio_overlay > div > div > button')).click()
+        self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.success-box.convert-msg-box')))
+        self.wait.until(lambda d: d.find_element(By.CLASS_NAME, 'info_popup_close_btn')).click()
 
-    def generate_choice_audio(self, element):
+    def generate_choice_audio(self):
         """
         Generate audio for multiple choice options.
 
         Args:
             element (WebElement): The button to trigger audio generation for choices.
         """
-        element.click()
+        self.elements.text_to_speech_buttons[-1].click()
         self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR,
                                             '#choice-audio-btn > div.text_to_audio_overlay > div > div:nth-child(2) > button')).click()
         self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR,
@@ -224,7 +231,7 @@ class AbiiUtils:
         Returns:
             StaticElements: Object containing references to static elements.
         """
-        return StaticElements(
+        self.elements = StaticElements(
             lesson_options=self.load_lesson_options(),
             lesson_name_input=self.wait.until(lambda d: d.find_element(By.ID, "lesson_name_input")),
             mark_as_ready_button=self.wait.until(lambda d: d.find_element(By.ID, "lesson_submit_btn")),
@@ -233,21 +240,23 @@ class AbiiUtils:
             logo_upload_input=self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "#logo_upload_and_info_btn > div:nth-child(2) > div:nth-child(1) > div > div > label > span")),
             mascot_buttons=self.wait.until(lambda d: d.find_element(By.ID, "character_overlay").find_elements(By.XPATH, ".//button")),
         )
+        return self.elements
         
-    def load_lesson_options(self) -> LessonOptions:
+    def load_lesson_options(self):
         """
         Load and return lesson options dropdown elements.
 
         Returns:
             LessonOptions: Object containing dropdown elements for lesson options.
         """
-        return LessonOptions(
+        self.elements = LessonOptions(
             lesson_type_dropdown = self.wait.until(lambda d: d.find_element(By.ID, "lesson_type")),
             grade_dropdown = self.wait.until(lambda d: d.find_element(By.ID, "grade")),
             language_dropdown = self.wait.until(lambda d: d.find_element(By.ID, "language")),
             unit_dropdown = self.wait.until(lambda d: d.find_element(By.ID, "unit")),
             standard_dropdown = self.wait.until(lambda d: d.find_element(By.ID, "standard"))
         )
+        return self.elements
 
     def load_answer_elements(self, answer_type_selection):
         """
@@ -269,11 +278,12 @@ class AbiiUtils:
             answer_container = self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "#sng_dsp_input_container"))
             answer_buttons = self.wait.until(lambda d: answer_container.find_elements(By.CSS_SELECTOR, '#sng_dsp_input_container > span > textarea'))
 
-        return AnswerElements(
+        self.elements = AnswerElements(
             answer_type_dropdown=answer_type_dropdown,
             answer_container=answer_container,
             answer_buttons=answer_buttons,
         )
+        return self.elements
 
     def load_preasssessment_elements(self, answer_type_selection):
         """
@@ -285,12 +295,13 @@ class AbiiUtils:
         Returns:
             PreAssessmentElements: Object containing pre-assessment elements.
         """
-        return PreAssessmentElements(
+        self.elements = PreAssessmentElements(
             answers = self.load_answer_elements(answer_type_selection),
             text_to_speech_buttons = self.wait.until(lambda d: d.find_elements(By.CLASS_NAME, "convert_text_to_audio_btn")),
             question_input = self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "#overall_question_input")),
             select_existing_image_button = self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "#screenImage")),
         )
+        return self.elements
 
     def load_introduction_elements(self):
         """
@@ -300,11 +311,12 @@ class AbiiUtils:
             IntroductionElements: Object containing introduction elements.
         """
         self.wait.until(lambda d: d.find_element(By.ID, "0")).click()
-        return IntroductionElements(
+        self.elements = IntroductionElements(
             select_existing_image_button=self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "#screenImage")),
             text_to_speech_buttons=self.wait.until(
                 lambda d: d.find_elements(By.CLASS_NAME, "convert_text_to_audio_btn")),
         )
+        return self.elements
 
     def load_subject_elements(self):
         """
@@ -314,11 +326,12 @@ class AbiiUtils:
             IntroductionElements: Object containing subject elements.
         """
         self.wait.until(lambda d: d.find_element(By.ID, "1")).click()
-        return IntroductionElements(
+        self.elements = IntroductionElements(
             select_existing_image_button=self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "#screenImage")),
             text_to_speech_buttons=self.wait.until(
                 lambda d: d.find_elements(By.CLASS_NAME, "convert_text_to_audio_btn")),
         )
+        return self.elements
 
     def load_step1_elements(self, answer_type_selection):
         """
@@ -331,13 +344,14 @@ class AbiiUtils:
             StepNElements: Object containing step 1 elements.
         """
         self.wait.until(lambda d: d.find_element(By.ID, "3")).click()
-        return StepNElements(
+        self.elements =  StepNElements(
             step_name_input=self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, '#sidebar_tabs_container > div:nth-child(5) > textarea')),
             select_existing_image_button = self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "#screenImage")),
             step_question_input=self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, '#body_whitebox > div:nth-child(5) > textarea')),
             answers = self.load_answer_elements(answer_type_selection),
             text_to_speech_buttons=self.wait.until(lambda d: d.find_elements(By.CLASS_NAME, "convert_text_to_audio_btn"))
         )
+        return self.elements
 
     def load_step_n_elements(self, answer_type_selection):
         """
@@ -351,7 +365,7 @@ class AbiiUtils:
         """
         self.wait.until(lambda d: d.find_element(By.ID, "add_screen")).click()
         self.wait.until(lambda d: d.find_element(By.ID, "4")).click()
-        return StepNElements(
+        self.elements =  StepNElements(
             step_name_input=self.wait.until(
                 lambda d: d.find_element(By.CSS_SELECTOR, '#sidebar_tabs_container > div:nth-child(6) > textarea')),
             select_existing_image_button=self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "#screenImage")),
@@ -361,6 +375,7 @@ class AbiiUtils:
             text_to_speech_buttons=self.wait.until(
                 lambda d: d.find_elements(By.CLASS_NAME, "convert_text_to_audio_btn"))
         )
+        return self.elements
 
     def load_recap_elements(self):
         """
@@ -370,11 +385,18 @@ class AbiiUtils:
             RecapElements: Object containing recap elements.
         """
         self.wait.until(lambda d: d.find_element(By.ID, "5")).click()
-        return RecapElements(
+        self.elements =  RecapElements(
             select_existing_image_button = self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "#screenImage")),
             recap_question_input= self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "#body_whitebox > div:nth-child(5) > textarea")),
             text_to_speech_buttons = self.wait.until(
             lambda d: d.find_elements(By.CLASS_NAME, "convert_text_to_audio_btn"))
         )
+        return self.elements
+
+
+# TODO: stop load methods from returning anything, get new elements through .get_elements()
+# TODO: add datatype SpeechButtons that contains the onload, wrong, and choice audio as objects, then update audio generators
+
+
 
 
