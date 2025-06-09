@@ -84,7 +84,7 @@ for index, row in df.iterrows():
     abii.fill_intro_page(abii.load_introduction_elements(), f'Lesson Set {row['Set']}, Question {row['Question Number']}', 1)
     logging.info("Entered introduction elements.")
     logging.info("Entering subject elements...")
-    abii.fill_intro_page(abii.load_subject_elements(), f"Let's get started!", 1)
+    abii.fill_subject_page(abii.load_subject_elements(), f"Let's get started!", 1)
     logging.info("Entered subject elements.")
 
     ##########################################################################################
@@ -104,7 +104,7 @@ for index, row in df.iterrows():
     abii.add_multiple_choice_answers(elements, row['Is Divisable?'])
     # add audio
     abii.generate_onload_audio(elements.text_to_speech_buttons[0], row['General Hint (Text + Audio)'])
-    abii.generate_onload_audio(elements.text_to_speech_buttons[1], ' ') # TODO: alias this function
+    abii.generate_wrong_audio(elements.text_to_speech_buttons[1], ' ') 
     abii.generate_choice_audio(elements.text_to_speech_buttons[2])
     logging.info("Entered step 1 elements.")
 
@@ -125,7 +125,7 @@ for index, row in df.iterrows():
     abii.add_multiple_choice_answers(elements, row['Is Divisable?'])
     # add audio
     abii.generate_onload_audio(elements.text_to_speech_buttons[0], row['Specific (Audio)'])
-    abii.generate_onload_audio(elements.text_to_speech_buttons[1], ' ')  # TODO: alias this function
+    abii.generate_wrong_audio(elements.text_to_speech_buttons[1], ' ')  
     abii.generate_choice_audio(elements.text_to_speech_buttons[2])
     logging.info("Entered step 2 elements.")
 
@@ -145,7 +145,7 @@ for index, row in df.iterrows():
     abii.generate_onload_audio(elements.text_to_speech_buttons[0], row['Detailed Hint (Audio)'])
     logging.info("Entered recap elements.")
 
-    logging.info(f"Processed question {index}.")
+    logging.info("Processed question %s.", index)
 
     # Save and move on
     elements_static.mark_as_ready_button.click()

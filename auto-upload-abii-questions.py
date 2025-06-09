@@ -4,7 +4,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 import os
 from dotenv import load_dotenv
-import abbi_utils
+from abii_utils import AbiiUtils
 
 def main():
     POSSIBLE_VALUES = ["1015", "Mental Math"]
@@ -20,13 +20,14 @@ def main():
     if text == POSSIBLE_VALUES[0]:
         selections = ["Python", "puzzle"]
     else:
-        selections = ["Lesson Set 1", "Lesson Set 2"]
+        selections = ["V1: Lesson Set 1", "V1: Lesson Set 2"]
 
     # set up
-    driver, wait = abbi_utils.driver_setup()
+    abii = AbiiUtils(EMAIL, PASS)
+    wait = abii.get_wait()
 
     # login
-    abbi_utils.abii_login(driver, wait, EMAIL, PASS)
+    abii.login()
 
     # Click Send Lessons to ABii
     send_lessons_btn = wait.until(
