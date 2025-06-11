@@ -20,7 +20,7 @@ def main():
     if text == POSSIBLE_VALUES[0]:
         selections = ["Python", "puzzle"]
     else:
-        selections = ["V1: Lesson Set 1", "V1: Lesson Set 2"]
+        selections = ["Abii: Lesson Set 1", "Abii: Lesson Set 2"]
 
     # set up
     abii = AbiiUtils(EMAIL, PASS)

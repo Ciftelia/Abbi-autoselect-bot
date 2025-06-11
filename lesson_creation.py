@@ -73,9 +73,9 @@ for index, row in df.iterrows():
     # Gen answers
 
     if row['Is Divisable?'] == 'Yes':
-        answers = ['Yes', "No", 'Hint 1']
+        answers = ['Yes', "No", 'Show Hint']
     else:
-        answers = ['No', "Yes", 'Hint 1']
+        answers = ['No', "Yes", 'Show Hint']
 
     # Add choices
     abii.add_multiple_choice_answers(answers)
@@ -109,9 +109,9 @@ for index, row in df.iterrows():
     # Gen answers
 
     if row['Is Divisable?'] == 'Yes':
-        answers = ['Yes', "No", 'Hint 2']
+        answers = ['Yes', "No", 'Show Another Hint']
     else:
-        answers = ['No', "Yes", 'Hint 2']
+        answers = ['No', "Yes", 'Show Another Hint']
 
     # add answers
     abii.add_multiple_choice_answers(answers)
@@ -136,9 +136,9 @@ for index, row in df.iterrows():
     elements.step_question_input.send_keys(row['Specific (Text)'])
     # add answers
     if row['Is Divisable?'] == 'Yes':
-        answers = ['Yes', "No", 'Hint 3']
+        answers = ['Yes', "No", 'Show Final Hint']
     else:
-        answers = ['No', "Yes", 'Hint 3']
+        answers = ['No', "Yes", 'Show Final Hint']
     abii.add_multiple_choice_answers(answers)
     # add audio
     abii.generate_onload_audio(row['Specific (Audio)'])
@@ -169,7 +169,7 @@ for index, row in df.iterrows():
     wait.until(EC.alert_is_present())
     alert = driver.switch_to.alert
     alert.accept()
-    time.sleep(3)
+    time.sleep(1.5)
 
 
 # Close the browser when done
