@@ -240,7 +240,7 @@ class AbiiUtils:
             logo_upload_input=self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "#logo_upload_and_info_btn > div:nth-child(2) > div:nth-child(1) > div > div > label > span")),
             mascot_buttons=self.wait.until(lambda d: d.find_element(By.ID, "character_overlay").find_elements(By.XPATH, ".//button")),
         )
-        return self.elements
+
         
     def load_lesson_options(self):
         """
@@ -256,7 +256,7 @@ class AbiiUtils:
             unit_dropdown = self.wait.until(lambda d: d.find_element(By.ID, "unit")),
             standard_dropdown = self.wait.until(lambda d: d.find_element(By.ID, "standard"))
         )
-        return self.elements
+
 
     def load_answer_elements(self, answer_type_selection):
         """
@@ -283,17 +283,17 @@ class AbiiUtils:
             answer_container=answer_container,
             answer_buttons=answer_buttons,
         )
-        return self.elements
+
 
     def load_preasssessment_elements(self, answer_type_selection):
         """
-        Load and return pre-assessment elements.
+        Loads pre-assessment elements for the lesson creation flow and sets them as the current elements.
 
         Args:
             answer_type_selection (str): The answer type to use for pre-assessment.
 
-        Returns:
-            PreAssessmentElements: Object containing pre-assessment elements.
+        Side Effects:
+            Sets self.elements to a PreAssessmentElements instance containing the located elements.
         """
         self.elements = PreAssessmentElements(
             answers = self.load_answer_elements(answer_type_selection),
@@ -301,14 +301,13 @@ class AbiiUtils:
             question_input = self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "#overall_question_input")),
             select_existing_image_button = self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "#screenImage")),
         )
-        return self.elements
 
     def load_introduction_elements(self):
         """
-        Load and return introduction elements after clicking the introduction tab.
+        Loads introduction elements after clicking the introduction tab and sets them as the current elements.
 
-        Returns:
-            IntroductionElements: Object containing introduction elements.
+        Side Effects:
+            Sets self.elements to an IntroductionElements instance containing the located elements.
         """
         self.wait.until(lambda d: d.find_element(By.ID, "0")).click()
         self.elements = IntroductionElements(
@@ -316,14 +315,13 @@ class AbiiUtils:
             text_to_speech_buttons=self.wait.until(
                 lambda d: d.find_elements(By.CLASS_NAME, "convert_text_to_audio_btn")),
         )
-        return self.elements
 
     def load_subject_elements(self):
         """
-        Load and return subject elements after clicking the subject tab.
+        Loads subject elements after clicking the subject tab and sets them as the current elements.
 
-        Returns:
-            IntroductionElements: Object containing subject elements.
+        Side Effects:
+            Sets self.elements to an IntroductionElements instance containing the located elements.
         """
         self.wait.until(lambda d: d.find_element(By.ID, "1")).click()
         self.elements = IntroductionElements(
@@ -331,17 +329,16 @@ class AbiiUtils:
             text_to_speech_buttons=self.wait.until(
                 lambda d: d.find_elements(By.CLASS_NAME, "convert_text_to_audio_btn")),
         )
-        return self.elements
 
     def load_step1_elements(self, answer_type_selection):
         """
-        Load and return elements for step 1 after clicking the step 1 tab.
+        Loads elements for step 1 after clicking the step 1 tab and sets them as the current elements.
 
         Args:
             answer_type_selection (str): The answer type to use for step 1.
 
-        Returns:
-            StepNElements: Object containing step 1 elements.
+        Side Effects:
+            Sets self.elements to a StepNElements instance containing the located elements.
         """
         self.wait.until(lambda d: d.find_element(By.ID, "3")).click()
         self.elements =  StepNElements(
@@ -351,17 +348,16 @@ class AbiiUtils:
             answers = self.load_answer_elements(answer_type_selection),
             text_to_speech_buttons=self.wait.until(lambda d: d.find_elements(By.CLASS_NAME, "convert_text_to_audio_btn"))
         )
-        return self.elements
 
-    def load_step_n_elements(self, answer_type_selection):
+    def load_step_2_elements(self, answer_type_selection):
         """
-        Load and return elements for step n after adding a new screen and clicking the step n tab.
+        Loads elements for step 2 after adding a new screen and clicking the step 2 tab, then sets them as the current elements.
 
         Args:
-            answer_type_selection (str): The answer type to use for step n.
+            answer_type_selection (str): The answer type to use for step 2.
 
-        Returns:
-            StepNElements: Object containing step n elements.
+        Side Effects:
+            Sets self.elements to a StepNElements instance containing the located elements.
         """
         self.wait.until(lambda d: d.find_element(By.ID, "add_screen")).click()
         self.wait.until(lambda d: d.find_element(By.ID, "4")).click()
@@ -375,14 +371,13 @@ class AbiiUtils:
             text_to_speech_buttons=self.wait.until(
                 lambda d: d.find_elements(By.CLASS_NAME, "convert_text_to_audio_btn"))
         )
-        return self.elements
 
     def load_recap_elements(self):
         """
-        Load and return recap elements after clicking the recap tab.
+        Loads recap elements after clicking the recap tab and sets them as the current elements.
 
-        Returns:
-            RecapElements: Object containing recap elements.
+        Side Effects:
+            Sets self.elements to a RecapElements instance containing the located elements.
         """
         self.wait.until(lambda d: d.find_element(By.ID, "5")).click()
         self.elements =  RecapElements(
@@ -391,7 +386,7 @@ class AbiiUtils:
             text_to_speech_buttons = self.wait.until(
             lambda d: d.find_elements(By.CLASS_NAME, "convert_text_to_audio_btn"))
         )
-        return self.elements
+
 
 
 # TODO: stop load methods from returning anything, get new elements through .get_elements()

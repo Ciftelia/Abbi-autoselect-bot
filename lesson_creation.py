@@ -44,7 +44,7 @@ for index, row in df.iterrows():
     # Static Elements #######################################################################
     #########################################################################################
     logging.info("Loading static elements...")
-    elements_static = abii.load_static_elements()
+    elements_static = abii.load_static_elements().get_elements()
     logging.info("Loaded static elements.")
     time.sleep(1)
     # TODO:  Make the lines below more clear with encapsulation.
@@ -63,7 +63,7 @@ for index, row in df.iterrows():
     ## PreAssessment Elements ################################################################
     ##########################################################################################
     logging.info("Loading pre-assessment elements...")
-    elements = abii.load_preasssessment_elements("Multiple choice large text answer")
+    elements = abii.load_preasssessment_elements("Multiple choice large text answer").get_elements()
     logging.info("Loaded pre-assessment elements.")
     time.sleep(1)
     # Add question
@@ -97,7 +97,7 @@ for index, row in df.iterrows():
     ## Step 1 Elements #######################################################################
     # ##########################################################################################
     logging.info("Loading step 1 elements...")
-    elements = abii.load_step1_elements("Multiple choice large text answer")
+    elements = abii.load_step1_elements("Multiple choice large text answer").get_elements()
     logging.info("Loaded step 1 elements.")
     time.sleep(1)
     # Set step name
@@ -125,7 +125,7 @@ for index, row in df.iterrows():
     ## Step 2 Elements #######################################################################
     ##########################################################################################
     logging.info("Loading step 2 elements...")
-    elements = abii.load_step_n_elements("Multiple choice large text answer")
+    elements = abii.load_step_2_elements("Multiple choice large text answer").get_elements()
     logging.info("Loaded step 2 elements.")
     time.sleep(1)
     # Set step name
@@ -151,7 +151,7 @@ for index, row in df.iterrows():
     ##########################################################################################
 
     logging.info("Loading recap elements...")
-    elements = abii.load_recap_elements()
+    elements = abii.load_recap_elements().get_elements()
     logging.info("Loaded recap elements.")
     time.sleep(1)
     # add image
