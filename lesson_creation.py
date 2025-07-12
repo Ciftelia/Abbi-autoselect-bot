@@ -34,7 +34,7 @@ wait = abii.get_wait()
 # Login
 abii.login()
 
-for index, row in df.iterrows():
+for index, row in df.iloc.iterrows():
     logging.info(f"Processing question %d...", index)
     logging.info("Opening lesson creation page...")
     abii.open_lesson_creation_page()
@@ -44,7 +44,8 @@ for index, row in df.iterrows():
     # Static Elements #######################################################################
     #########################################################################################
     logging.info("Loading static elements...")
-    elements_static = abii.load_static_elements().get_elements()
+    abii.load_static_elements()
+    elements_static = abii.get_elements()
     logging.info("Loaded static elements.")
     time.sleep(1)
     # TODO:  Make the lines below more clear with encapsulation.
@@ -54,7 +55,7 @@ for index, row in df.iterrows():
     )
     abii.select_from_dropdown_by_index(elements_static.lesson_options.unit_dropdown, 2)
     abii.select_from_dropdown_by_index(elements_static.lesson_options.standard_dropdown, 2)
-    elements_static.lesson_name_input.send_keys(f"Abii: Lesson Set {row['Set']} Q{row['Question Number']:02d}")
+    elements_static.lesson_name_input.send_keys(f"Abii: Lesson Set {row['Set']} Q{row['True Order']:02d}")
     # TODO: Make this more clear.
     elements_static.mascot_buttons[1].click()
     logging.info("Entered static elements.")
@@ -63,7 +64,8 @@ for index, row in df.iterrows():
     ## PreAssessment Elements ################################################################
     ##########################################################################################
     logging.info("Loading pre-assessment elements...")
-    elements = abii.load_preasssessment_elements("Multiple choice large text answer").get_elements()
+    abii.load_preasssessment_elements("Multiple choice large text answer")
+    elements = abii.get_elements()
     logging.info("Loaded pre-assessment elements.")
     time.sleep(1)
     # Add question
@@ -97,7 +99,8 @@ for index, row in df.iterrows():
     ## Step 1 Elements #######################################################################
     # ##########################################################################################
     logging.info("Loading step 1 elements...")
-    elements = abii.load_step1_elements("Multiple choice large text answer").get_elements()
+    abii.load_step1_elements("Multiple choice large text answer")
+    elements = abii.get_elements()
     logging.info("Loaded step 1 elements.")
     time.sleep(1)
     # Set step name
@@ -125,7 +128,8 @@ for index, row in df.iterrows():
     ## Step 2 Elements #######################################################################
     ##########################################################################################
     logging.info("Loading step 2 elements...")
-    elements = abii.load_step_2_elements("Multiple choice large text answer").get_elements()
+    abii.load_step_2_elements("Multiple choice large text answer")
+    elements = abii.get_elements()
     logging.info("Loaded step 2 elements.")
     time.sleep(1)
     # Set step name
@@ -151,7 +155,8 @@ for index, row in df.iterrows():
     ##########################################################################################
 
     logging.info("Loading recap elements...")
-    elements = abii.load_recap_elements().get_elements()
+    abii.load_recap_elements()
+    elements = abii.get_elements()
     logging.info("Loaded recap elements.")
     time.sleep(1)
     # add image

@@ -232,7 +232,7 @@ class AbiiUtils:
             StaticElements: Object containing references to static elements.
         """
         self.elements = StaticElements(
-            lesson_options=self.load_lesson_options(),
+            lesson_options=self.get_lesson_options(),
             lesson_name_input=self.wait.until(lambda d: d.find_element(By.ID, "lesson_name_input")),
             mark_as_ready_button=self.wait.until(lambda d: d.find_element(By.ID, "lesson_submit_btn")),
             save_button=self.wait.until(lambda d: d.find_element(By.ID, "lesson_save_btn")),
@@ -240,16 +240,17 @@ class AbiiUtils:
             logo_upload_input=self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "#logo_upload_and_info_btn > div:nth-child(2) > div:nth-child(1) > div > div > label > span")),
             mascot_buttons=self.wait.until(lambda d: d.find_element(By.ID, "character_overlay").find_elements(By.XPATH, ".//button")),
         )
+        print(self.elements)
 
         
-    def load_lesson_options(self):
+    def get_lesson_options(self):
         """
         Load and return lesson options dropdown elements.
 
         Returns:
             LessonOptions: Object containing dropdown elements for lesson options.
         """
-        self.elements = LessonOptions(
+        return LessonOptions(
             lesson_type_dropdown = self.wait.until(lambda d: d.find_element(By.ID, "lesson_type")),
             grade_dropdown = self.wait.until(lambda d: d.find_element(By.ID, "grade")),
             language_dropdown = self.wait.until(lambda d: d.find_element(By.ID, "language")),
@@ -258,7 +259,7 @@ class AbiiUtils:
         )
 
 
-    def load_answer_elements(self, answer_type_selection):
+    def get_answer_elements(self, answer_type_selection):
         """
         Load and return answer elements for the specified answer type.
 
@@ -278,7 +279,7 @@ class AbiiUtils:
             answer_container = self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "#sng_dsp_input_container"))
             answer_buttons = self.wait.until(lambda d: answer_container.find_elements(By.CSS_SELECTOR, '#sng_dsp_input_container > span > textarea'))
 
-        self.elements = AnswerElements(
+        return AnswerElements(
             answer_type_dropdown=answer_type_dropdown,
             answer_container=answer_container,
             answer_buttons=answer_buttons,
@@ -296,11 +297,12 @@ class AbiiUtils:
             Sets self.elements to a PreAssessmentElements instance containing the located elements.
         """
         self.elements = PreAssessmentElements(
-            answers = self.load_answer_elements(answer_type_selection),
+            answers = self.get_answer_elements(answer_type_selection),
             text_to_speech_buttons = self.wait.until(lambda d: d.find_elements(By.CLASS_NAME, "convert_text_to_audio_btn")),
             question_input = self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "#overall_question_input")),
             select_existing_image_button = self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "#screenImage")),
         )
+        print(self.elements)
 
     def load_introduction_elements(self):
         """
@@ -345,7 +347,7 @@ class AbiiUtils:
             step_name_input=self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, '#sidebar_tabs_container > div:nth-child(5) > textarea')),
             select_existing_image_button = self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "#screenImage")),
             step_question_input=self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, '#body_whitebox > div:nth-child(5) > textarea')),
-            answers = self.load_answer_elements(answer_type_selection),
+            answers = self.get_answer_elements(answer_type_selection),
             text_to_speech_buttons=self.wait.until(lambda d: d.find_elements(By.CLASS_NAME, "convert_text_to_audio_btn"))
         )
 
@@ -367,7 +369,7 @@ class AbiiUtils:
             select_existing_image_button=self.wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "#screenImage")),
             step_question_input=self.wait.until(
                 lambda d: d.find_element(By.CSS_SELECTOR, '#body_whitebox > div:nth-child(5) > textarea')),
-            answers=self.load_answer_elements(answer_type_selection),
+            answers=self.get_answer_elements(answer_type_selection),
             text_to_speech_buttons=self.wait.until(
                 lambda d: d.find_elements(By.CLASS_NAME, "convert_text_to_audio_btn"))
         )
