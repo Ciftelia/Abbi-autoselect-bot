@@ -22,6 +22,10 @@ logging.basicConfig(
 # Process spreadsheet
 logging.info("Processing Excel Spreadsheet...")
 df = pd.read_excel("all questions.xlsx")
+df = df.dropna(subset=['True Order'])
+df['Set'] = df['Set'].astype(int)
+df['True Order'] = df['True Order'].astype(int)
+df['Is Divisable?'] = df['Is Divisable?'].astype(bool)
 logging.info("Processed Excel Spreadsheet.")
 
 # Set up
@@ -34,8 +38,9 @@ wait = abii.get_wait()
 # Login
 abii.login()
 
-for index, row in df.iloc.iterrows():
-    logging.info(f"Processing question %d...", index)
+for index, row in df.iloc[10:].iterrows():
+    print(row['Detailed Hint (HTML Text)'])
+    logging.info(f"Processing question %d...", row['True Order'])
     logging.info("Opening lesson creation page...")
     abii.open_lesson_creation_page()
     logging.info("Opened lesson creation page.")
@@ -74,7 +79,7 @@ for index, row in df.iloc.iterrows():
     abii.add_image(1)
     # Gen answers
 
-    if row['Is Divisable?'] == 'Yes':
+    if row['Is Divisable?']:
         answers = ['Yes', "No", 'Show Hint']
     else:
         answers = ['No', "Yes", 'Show Hint']
@@ -89,7 +94,7 @@ for index, row in df.iloc.iterrows():
     ## Introduction and Subject Elements #####################################################
     ##########################################################################################
     logging.info("Entering introduction elements...")
-    abii.fill_intro_page( f'Lesson Set {row['Set']}, Question {row['Question Number']}', 1)
+    abii.fill_intro_page( f'Lesson Set {row['Set']}, Question {row['True Order']}', 1)
     logging.info("Entered introduction elements.")
     logging.info("Entering subject elements...")
     abii.fill_subject_page(f"Let's get started!", 1)
@@ -111,7 +116,7 @@ for index, row in df.iloc.iterrows():
     elements.step_question_input.send_keys(row['General Hint (Text + Audio)'])
     # Gen answers
 
-    if row['Is Divisable?'] == 'Yes':
+    if row['Is Divisable?']:
         answers = ['Yes', "No", 'Show Another Hint']
     else:
         answers = ['No', "Yes", 'Show Another Hint']
@@ -139,7 +144,7 @@ for index, row in df.iloc.iterrows():
     # add step question
     elements.step_question_input.send_keys(row['Specific (Text)'])
     # add answers
-    if row['Is Divisable?'] == 'Yes':
+    if row['Is Divisable?']:
         answers = ['Yes', "No", 'Show Final Hint']
     else:
         answers = ['No', "Yes", 'Show Final Hint']
@@ -167,7 +172,7 @@ for index, row in df.iloc.iterrows():
     abii.generate_onload_audio(row['Detailed Hint (Audio)'])
     logging.info("Entered recap elements.")
 
-    logging.info("Processed question %d.", index)
+    logging.info("Processed question %d.", row['True Order'])
 
     # Save and move on
     elements_static.mark_as_ready_button.click()
